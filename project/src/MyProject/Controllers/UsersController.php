@@ -4,9 +4,9 @@ namespace MyProject\Controllers;
 
 use MyProject\Exceptions\InvalidArgumentException;
 use MyProject\Models\Users\User;
-use MyProject\Models\Users\UserActivationService;
-use MyProject\Models\Users\UsersAuthService;
 use MyProject\Services\EmailSender;
+use MyProject\Services\UserActivationService;
+use MyProject\Services\UsersAuthService;
 
 class UsersController extends AbstractController
 {
