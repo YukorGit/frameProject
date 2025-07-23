@@ -5,6 +5,9 @@ try {
         require_once __DIR__ . '/../src/' . str_replace('\\', '/', $className) . '.php';
     });
 
+    $container = require __DIR__ . '/../src/services.php';
+    \MyProject\Models\ActiveRecordEntity::setDb($container->get('db'));
+
     $route = $_GET['route'] ?? '';
     $routes = require __DIR__ . '/../src/routes.php';
 
@@ -26,7 +29,13 @@ try {
     $controllerName = $controllerAndAction[0];
     $actionName = $controllerAndAction[1];
 
-    $controller = new $controllerName();
+    $user = \MyProject\Services\UsersAuthService::getUserByToken($container->get('db'));
+
+    $controller = new $controllerName(
+        $container->get('view'),
+        $user,
+        $container->get('users_service')
+    );
     $controller->$actionName(...$matches);
 } catch (\MyProject\Exceptions\DbException $e) {
     $view = new \MyProject\View\View(__DIR__ . '/../templates/errors');
