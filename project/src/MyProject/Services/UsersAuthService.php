@@ -1,6 +1,8 @@
 <?php
 
-namespace MyProject\Models\Users;
+namespace MyProject\Services;
+
+use MyProject\Models\Users\User;
 
 class UsersAuthService
 {
