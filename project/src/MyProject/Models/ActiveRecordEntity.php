@@ -6,6 +6,9 @@ use MyProject\Services\Db;
 
 abstract class ActiveRecordEntity
 {
+
+    protected static ?Db $db = null;
+
     /** @var int */
     protected $id;
 
@@ -28,13 +31,17 @@ abstract class ActiveRecordEntity
         return lcfirst(str_replace('_', '', ucwords($source, '_')));
     }
 
+    public static function setDb(Db $db): void
+    {
+        self::$db = $db;
+    }
+
     /**
      * @return static[]
      */
     public static function findAll(): array
     {
-        $db = Db::getInstance();
-        return $db->query('SELECT * FROM `' . static::getTableName() . '`;', [], static::class);
+        return self::$db->query('SELECT * FROM `' . static::getTableName() . '`;', [], static::class);
     }
 
     /**
@@ -43,8 +50,7 @@ abstract class ActiveRecordEntity
      */
     public static function getById(int $id): ?self
     {
-        $db = Db::getInstance();
-        $entities = $db->query(
+        $entities = self::$db->query(
             'SELECT * FROM `' . static::getTableName() . '` WHERE id=:id;',
             [':id' => $id],
             static::class
@@ -64,8 +70,7 @@ abstract class ActiveRecordEntity
 
     public function delete(): void
     {
-        $db = Db::getInstance();
-        $db->query(
+        self::$db->query(
             'DELETE FROM `' . static::getTableName() . '` WHERE id = :id',
             [':id' => $this->id]
         );
@@ -74,8 +79,7 @@ abstract class ActiveRecordEntity
 
     public static function findOneByColumn(string $columnName, $value): ?self
     {
-        $db = Db::getInstance();
-        $result = $db->query(
+        $result = self::$db->query(
             'SELECT * FROM `' . static::getTableName() . '` WHERE `' . $columnName . '` = :value LIMIT 1;',
             [':value' => $value],
             static::class
@@ -100,8 +104,7 @@ abstract class ActiveRecordEntity
             $index++;
         }
         $sql = 'UPDATE ' . static::getTableName() . ' SET ' . implode(', ', $columns2params) . ' WHERE id = ' . $this->id;
-        $db = Db::getInstance();
-        $db->query($sql, $params2values, static::class);
+        self::$db->query($sql, $params2values, static::class);
     }
 
     private function insert(array $mappedProperties): void
@@ -123,9 +126,8 @@ abstract class ActiveRecordEntity
 
         $sql = 'INSERT INTO ' . static::getTableName() . ' (' . $columnsViaSemicolon . ') VALUES (' . $paramsNamesViaSemicolon . ');';
 
-        $db = Db::getInstance();
-        $db->query($sql, $params2values, static::class);
-        $this->id = $db->getLastInsertId();
+        self::$db->query($sql, $params2values, static::class);
+        $this->id = self::$db->getLastInsertId();
         $this->refresh();
     }
 

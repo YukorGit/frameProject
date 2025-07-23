@@ -12,12 +12,10 @@ class Db
     /** @var PDO */
     private PDO $pdo;
 
-    private function __construct()
+    public function __construct(array $dbOptions)
     {
-        $dbOptions = (require __DIR__ . '/../../settings.php')['db'];
-
         try {
-            $this->pdo = new PDO(
+            $this->pdo = new \PDO(
                 'mysql:host=' . $dbOptions['host'] . ';dbname=' . $dbOptions['dbname'],
                 $dbOptions['user'],
                 $dbOptions['password']
