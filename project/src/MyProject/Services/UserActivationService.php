@@ -13,7 +13,7 @@ class UserActivationService
         $this->db = $db;
     }
 
-    public static function createActivationCode(User $user): string
+    public function createActivationCode(User $user): string
     {
         $code = bin2hex(random_bytes(16));
 
@@ -25,7 +25,7 @@ class UserActivationService
         return $code;
     }
 
-    public static function checkActivationCode(User $user, string $code): bool
+    public function checkActivationCode(User $user, string $code): bool
     {
         $result = $this->db->query(
             'SELECT * FROM ' . self::TABLE_NAME . ' WHERE user_id = :user_id AND code = :code',
